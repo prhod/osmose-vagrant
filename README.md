@@ -13,7 +13,7 @@ Setps to launch a backend tests batch :
 3. run `vagrant up` in your repository
 4. run `vagrant ssh`
 5. go to the backend dir `cd /data/backend`
-6. activate python virtualenv `source osmose-backend-env/bin/activate`
+6. activate python virtualenv `source osmose-backend-venv/bin/activate`
 7. run `python osmose_run.py -h` to see all available commands
 
 The results are stored in the `/data/work/` directory.
