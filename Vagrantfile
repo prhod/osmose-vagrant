@@ -11,6 +11,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.synced_folder ".", "/data"
 
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 1
+  end
+
+
   config.vm.provision :shell, :privileged => false, :inline => "sh /data/setup.sh"
   config.vm.provision :shell, :privileged => false, :inline => "sh /data/setup_backend.sh"
   config.vm.provision :shell, :privileged => false, :inline => "sh /data/setup_frontend.sh"
