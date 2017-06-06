@@ -23,6 +23,7 @@ sudo -u postgres psql -c "GRANT SELECT,UPDATE,DELETE,INSERT ON TABLE geometry_co
 # creation of frontend database
 sudo -u postgres bash -c "createdb -E UTF8 -T template0 -O osmose osmose_frontend;"
 sudo -u postgres psql -c "CREATE extension hstore; CREATE extension postgis;" osmose_frontend
+psql osmose_frontend -f tools/database/schema.sql
 
 touch ~/.pgpass
 echo "localhost:5432:*:osmose:-osmose-" >> ~/.pgpass

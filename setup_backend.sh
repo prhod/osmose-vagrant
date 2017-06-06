@@ -12,7 +12,6 @@ mkdir -p /data/backend
 git clone https://github.com/osm-fr/osmose-backend /data/backend
 cd /data/backend
 virtualenv --python=python2.7 osmose-backend-venv
-deactivate
 . osmose-backend-venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements-dev.txt

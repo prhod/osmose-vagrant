@@ -22,5 +22,7 @@ Exemple of one analyse run on one country :
 
 The results are stored in the `/data/work/` directory.
 
+TODO : Check how to clean up archives and database using `backend/tools/cron.sh`
+
 ### First use of the FrontEnd
 Yet to be done
