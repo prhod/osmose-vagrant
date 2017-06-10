@@ -23,7 +23,8 @@ sudo -u postgres psql -c "GRANT SELECT,UPDATE,DELETE,INSERT ON TABLE geometry_co
 # creation of frontend database
 sudo -u postgres bash -c "createdb -E UTF8 -T template0 -O osmose osmose_frontend;"
 sudo -u postgres psql -c "CREATE extension hstore; CREATE extension postgis;" osmose_frontend
-psql osmose_frontend -f tools/database/schema.sql
+psql -h localhost -U osmose -d osmose_frontend -f frontend/tools/database/schema.sql
+psql -h localhost -U osmose -d osmose_frontend -f frontend/tools/database/18_add_version_on_update_last.sql
 
 touch ~/.pgpass
 echo "localhost:5432:*:osmose:-osmose-" >> ~/.pgpass
@@ -31,6 +32,10 @@ sudo chmod 600 ~/.pgpass
 # allow connection to localhost via unix socket
 #sudo sed -i -e "s/local   all             all                                     peer/local   all             all                                     md5/g" pg_hba.conf
 #sudo /etc/init.d/postgresql reload
+
+#Changind umask of user vagrant to fix issue with cache file write protection
+sudo sed -i.bak 's/[#]*umask[ ]*[\t]*022/umask 002/' /home/osmose/.profile
+source /home/osmose/.profile
 
 # ------ initialisation of the apache server and frontend dependencies -------
 sudo apt install apache2 libapache2-mod-wsgi -y
