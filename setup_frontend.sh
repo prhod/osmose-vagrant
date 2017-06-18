@@ -28,7 +28,6 @@ sudo sh -c "echo 'export LC_ALL=\"fr_FR.UTF-8\"' >> ~/.bashrc"
 sudo locale-gen "en_US.UTF-8"
 sudo locale-gen "fr_FR.UTF-8"
 source ~/.bashrc
-psql -h localhost -f tools/database/schema.sql osmose_frontend osmose
 
 mkdir -p /data/work/export
 
@@ -57,5 +56,8 @@ cd /data/frontend/po && make mo
 cd /data/frontend
 git submodule update --init
 
-#No need to exec those scripts, DB should be empty on a fresh install
-#No need to generate de .poly files or generate-cover
+#populating osmose_frontend database with required data
+python import_front_dbdata.py 'dynpoi_categ' > /tmp/tmp.sql
+psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql
+python import_front_dbdata.py 'dynpoi_item' > /tmp/tmp.sql
+psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql
