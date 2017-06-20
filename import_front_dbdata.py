@@ -12,7 +12,7 @@ def import_data(table, data_file):
                     table,
                     idx,
                     int(float(idx) / 1000 * 10),
-                    label.replace('"', '""'))
+                    label.replace('"', '"""'))
             else:
                 sql += "insert into {} values ({}, '\"en\"=>\"{}\"');\n".format(table, idx, label)
     return sql

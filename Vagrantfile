@@ -17,9 +17,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
 
-  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup.sh"
-  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup_backend.sh"
-  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup_frontend.sh"
-  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup_front_back_link.sh"
+  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup1.sh"
+  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup2_backend.sh"
+  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup3_frontend.sh"
+  config.vm.provision :shell, :privileged => false, :inline => "bash /data/setup4_front_back_link.sh"
   config.vm.network "forwarded_port", guest: 80, host: 8888
 end
