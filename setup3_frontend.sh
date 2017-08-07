@@ -30,14 +30,9 @@ pip install freetype-py  >> /data/setup.log
 echo 'installing numpy' >> /data/setup.log
 echo 'installing numpy'
 pip install numpy >> /data/setup.log
-#PIL in requirements is replaced by pillow
-sudo sed -i.bak '/PIL/d' requirements.txt  >> /data/setup.log
 echo 'installing requirements.txt' >> /data/setup.log
 echo 'installing requirements.txt'
 pip install -r requirements.txt  --allow-all-external  >> /data/setup.log
-echo 'installing pillow' >> /data/setup.log
-echo 'installing pillow'
-pip install pillow  >> /data/setup.log
 
 echo "Configuration of the Apache site" >> /data/setup.log
 echo "Configuration of the Apache site"
