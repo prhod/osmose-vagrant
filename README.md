@@ -6,7 +6,7 @@ This local virtual machine is for new analysis modules developpment only, and do
 
 ## Installation and first use
 To install this virtual machine, here are the steps :
-1. install vagrant
+1. install vagrant and the trigger plugin (`vagrant plugin install vagrant-triggers`)
 2. Clone this repository and set current directory to local directory
 3. run `vagrant up` in your repository
 4. run `vagrant ssh` to connect to the virtual machine
