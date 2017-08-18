@@ -3,37 +3,63 @@
 echo '-----------setup3_frontend.sh------------' >> /data/setup.log
 echo '-----------setup3_frontend.sh------------'
 
-echo "Downloading frontend from GitHub"  >> /data/setup.log
-echo "Downloading frontend from GitHub"
-rm -rf /data/frontend
-mkdir -p /data/frontend
-git clone https://github.com/osm-fr/osmose-frontend /data/frontend
-cd /data/frontend
-mkdir session
+if [ -e /data/frontend ]; then
+    echo "/data/frontend directory exists. Skipping github clonning."
+    echo "/data/frontend directory exists. Skipping github clonning." >> /data/setup.log
+else
+    echo "Downloading frontend from GitHub"  >> /data/setup.log
+    echo "Downloading frontend from GitHub"
+    rm -rf /data/frontend
+    mkdir -p /data/frontend
+    git clone https://github.com/osm-fr/osmose-frontend /data/frontend
+    cd /data/frontend
+    mkdir session
+    sudo chmod 777 /data/frontend/session
+
+    echo "Installing virtualenv dependencies" >> /data/setup.log
+    echo "Installing virtualenv dependencies"
+    virtualenv --python=python2.7 osmose-frontend-venv
+    source osmose-frontend-venv/bin/activate
+    sudo apt-get install pkg-config libfreetype6-dev -y >> /data/setup.log
+    sudo apt-get install libjpeg-dev -y  >> /data/setup.log
+    pip install requests beaker bottle-beaker  >> /data/setup.log
+    pip install rauth >> /data/setup.log
+    pip install freetype-py  >> /data/setup.log
+    echo 'installing numpy' >> /data/setup.log
+    echo 'installing numpy'
+    pip install numpy >> /data/setup.log
+    echo 'installing requirements.txt' >> /data/setup.log
+    echo 'installing requirements.txt'
+    pip install -r requirements.txt  --allow-all-external  >> /data/setup.log
+
+
+    echo "Generating mo files" >> /data/setup.log
+    echo "Generating mo files"
+    cd /data/frontend/po && make mo >> /data/setup.log
+    cd /data/frontend
+
+    echo "initialisation of the submodules" >> /data/setup.log
+    echo "initialisation of the submodules"
+    git submodule update --init >> /data/setup.log
+
+fi
 
 echo "Creation of the frontend database" >> /data/setup.log
 echo "Creation of the frontend database"
+cd /data/frontend/tools
+sed -i.bak 's/.*pg_host .*/pg_host           = "localhost"/g' /data/frontend/tools/utils.py
 sudo -u postgres bash -c "createdb -E UTF8 -T template0 -O osmose osmose_frontend;"  >> /data/setup.log
 sudo -u postgres psql -c "CREATE extension hstore; CREATE extension postgis;" osmose_frontend  >> /data/setup.log
 psql -h localhost -U osmose -d osmose_frontend -f /data/frontend/tools/database/schema.sql  >> /data/setup.log
 psql -h localhost -U osmose -d osmose_frontend -f /data/frontend/tools/database/18_add_version_on_update_last.sql  >> /data/setup.log
 
-
-echo "Installing virtualenv dependencies" >> /data/setup.log
-echo "Installing virtualenv dependencies"
-virtualenv --python=python2.7 osmose-frontend-venv
-source osmose-frontend-venv/bin/activate
-sudo apt-get install pkg-config libfreetype6-dev -y >> /data/setup.log
-sudo apt-get install libjpeg-dev -y  >> /data/setup.log
-pip install requests beaker bottle-beaker  >> /data/setup.log
-pip install rauth >> /data/setup.log
-pip install freetype-py  >> /data/setup.log
-echo 'installing numpy' >> /data/setup.log
-echo 'installing numpy'
-pip install numpy >> /data/setup.log
-echo 'installing requirements.txt' >> /data/setup.log
-echo 'installing requirements.txt'
-pip install -r requirements.txt  --allow-all-external  >> /data/setup.log
+echo "populating osmose_frontend database with required data" >> /data/setup.log
+echo "populating osmose_frontend database with required data"
+cd /data
+python import_front_dbdata.py 'dynpoi_categ' > /tmp/tmp.sql
+psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.log
+python import_front_dbdata.py 'dynpoi_item' > /tmp/tmp.sql
+psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.log
 
 echo "Configuration of the Apache site" >> /data/setup.log
 echo "Configuration of the Apache site"
@@ -57,21 +83,3 @@ sudo a2enmod expires.load  >> /data/setup.log
 sudo a2enmod rewrite.load  >> /data/setup.log
 sudo service apache2 reload  >> /data/setup.log
 mkdir -p /data/work/export
-
-
-echo "Generating mo files" >> /data/setup.log
-echo "Generating mo files"
-cd /data/frontend/po && make mo >> /data/setup.log
-cd /data/frontend
-
-echo "initialisation of the submodules" >> /data/setup.log
-echo "initialisation of the submodules"
-git submodule update --init >> /data/setup.log
-
-echo "populating osmose_frontend database with required data" >> /data/setup.log
-echo "populating osmose_frontend database with required data"
-cd /data
-python import_front_dbdata.py 'dynpoi_categ' > /tmp/tmp.sql
-psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.log
-python import_front_dbdata.py 'dynpoi_item' > /tmp/tmp.sql
-psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.log

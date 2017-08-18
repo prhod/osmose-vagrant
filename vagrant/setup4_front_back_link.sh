@@ -14,7 +14,6 @@ sudo sed -i.bak 's/.*france_local_db.analyser\["merge_public_transport_FR_transg
 
 echo "populate the source and source_password tables of osmose_frontend database" >> /data/setup.log
 echo "populate the source and source_password tables of osmose_frontend database"
-cd /data/frontend/tools
-sed -i.bak 's/.*pg_host .*/pg_host           = "localhost"/g' /data/frontend/tools/utils.py
 source /data/backend/osmose-backend-venv/bin/activate
+cd /data/frontend/tools
 python update-passwords.py  >> /data/setup.log
