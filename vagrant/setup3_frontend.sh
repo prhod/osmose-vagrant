@@ -16,8 +16,28 @@ else
     mkdir session
     sudo chmod 777 /data/frontend/session
 
-    echo "Installing virtualenv dependencies" >> /data/setup.log
-    echo "Installing virtualenv dependencies"
+    echo "Generating mo files" >> /data/setup.log
+    echo "Generating mo files"
+    cd /data/frontend/po && make mo >> /data/setup.log
+    cd /data/frontend
+
+    echo "initialisation of the submodules" >> /data/setup.log
+    echo "initialisation of the submodules"
+    git submodule update --init >> /data/setup.log
+
+
+    # modification of tools/utils.py
+    sudo sed -i.bak 's/.*website .*"osmose.openstreetmap.fr"/website = "localhost:8888"/' /data/frontend/tools/utils.py
+    sudo sed -i.bak 's/dir_results .*/dir_results = "\/data\/work\/results"/' /data/frontend/tools/utils.py
+
+    # modification of the backend configuration with the frontend config (with Vagrant internal http port)
+    sudo sed -i.bak 's/http:\/\/osmose.openstreetmap.fr/http:\/\/localhost:80/' /data/backend/modules/config.py
+    sudo sed -i.bak 's/http:\/\/opendata.osmose.openstreetmap.fr/http:\/\/localhost:80/' /data/backend/modules/config.py
+fi
+
+if [ ! -e /data/frontend/osmose-frontend-venv ]; then
+    echo "Installing frontend virtualenv dependencies" >> /data/setup.log
+    echo "Installing frontend virtualenv dependencies"
     virtualenv --python=python2.7 osmose-frontend-venv
     source osmose-frontend-venv/bin/activate
     sudo apt-get install pkg-config libfreetype6-dev -y >> /data/setup.log
@@ -31,17 +51,6 @@ else
     echo 'installing requirements.txt' >> /data/setup.log
     echo 'installing requirements.txt'
     pip install -r requirements.txt  --allow-all-external  >> /data/setup.log
-
-
-    echo "Generating mo files" >> /data/setup.log
-    echo "Generating mo files"
-    cd /data/frontend/po && make mo >> /data/setup.log
-    cd /data/frontend
-
-    echo "initialisation of the submodules" >> /data/setup.log
-    echo "initialisation of the submodules"
-    git submodule update --init >> /data/setup.log
-
 fi
 
 echo "Creation of the frontend database" >> /data/setup.log
@@ -61,6 +70,12 @@ psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.l
 python import_front_dbdata.py 'dynpoi_item' > /tmp/tmp.sql
 psql -h localhost -U osmose -d osmose_frontend -f /tmp/tmp.sql  >> /data/setup.log
 
+# ------ initialisation of the apache server and frontend dependencies -------
+echo 'initialisation of apache'
+sudo apt install apache2 libapache2-mod-wsgi -y   >> /data/setup.log
+sudo apt install gettext librsvg2-bin -y  >> /data/setup.log
+
+
 echo "Configuration of the Apache site" >> /data/setup.log
 echo "Configuration of the Apache site"
 sudo cp /data/frontend/apache-site /etc/apache2/sites-available/osmose.conf
@@ -68,18 +83,14 @@ sudo sed -i.bak 's/.*ServerName .*/\tServerName osmose.vagrant.local/' /etc/apac
 sudo sed -i.bak '/ServerAlias /d' /etc/apache2/sites-available/osmose.conf
 sudo sed -i.bak 's/data\/project\/osmose/data/g' /etc/apache2/sites-available/osmose.conf
 sudo sed -i.bak 's/data\/work\/osmose\/export/data\/work\/export/g' /etc/apache2/sites-available/osmose.conf
-sudo sed -i.bak 's/.*WSGIDaemonProcess .*/\tWSGIDaemonProcess osmose processes=2 threads=15 user=osmose group=osmose python-home=\/data\/frontend\/osmose-frontend-venv\//' /etc/apache2/sites-available/osmose.conf
-# modification of tools/utils.py
-sudo sed -i.bak 's/.*website .*"osmose.openstreetmap.fr"/website = "localhost:8888"/' /data/frontend/tools/utils.py
-sudo sed -i.bak 's/dir_results .*/dir_results = "\/data\/work\/results"/' /data/frontend/tools/utils.py
+sudo sed -i.bak 's/.*WSGIDaemonProcess .*/\tWSGIDaemonProcess osmose processes=2 threads=15 user=ubuntu group=ubuntu python-home=\/data\/frontend\/osmose-frontend-venv\//' /etc/apache2/sites-available/osmose.conf
 
-# modification of the backend configuration with the frontend config (with Vagrant internal http port)
-sudo sed -i.bak 's/http:\/\/osmose.openstreetmap.fr/http:\/\/localhost:80/' /data/backend/modules/config.py
-sudo sed -i.bak 's/http:\/\/opendata.osmose.openstreetmap.fr/http:\/\/localhost:80/' /data/backend/modules/config.py
 
 sudo a2dissite 000-default.conf >> /data/setup.log
 sudo a2ensite osmose.conf   >> /data/setup.log
 sudo a2enmod expires.load  >> /data/setup.log
 sudo a2enmod rewrite.load  >> /data/setup.log
 sudo service apache2 reload  >> /data/setup.log
+# bottle.run(app=osmose.app, host='0.0.0.0', port=80, reloader=True, debug=True, server='cherrypy')
+
 mkdir -p /data/work/export
