@@ -21,18 +21,27 @@ source ~/.bashrc
 message='Updating packages'
 echo $message
 echo $message >> /data/setup.log
-sudo apt-get -q update >> /data/setup.log
-sudo apt-get -q upgrade >> /data/setup.log
+sudo apt-get -q update >> /dev/null
+sudo apt-get -q upgrade >> /dev/null
 
 message='installing first dependencies (java, python, postresg)'
 echo $message
 echo $message >> /data/setup.log
 #install backend dependencies
-sudo apt-get install build-essential -y >> /data/setup.log
-sudo apt install openjdk-8-jre-headless -y >> /data/setup.log
-sudo apt install git python-dev python-virtualenv libpq-dev protobuf-compiler libprotobuf-dev -y  >> /data/setup.log
-sudo apt-get install postgresql-9.5 postgresql-contrib-9.5 postgresql-client-common -y  >> /data/setup.log
-sudo apt-get install postgresql-9.5-postgis-2.2 -y >> /data/setup.log
+sudo apt-get install build-essential gettext -y >> /dev/null
+message='installing java'
+echo $message
+echo $message >> /data/setup.log
+sudo apt install openjdk-8-jre-headless -y >> /dev/null
+message='installing python'
+echo $message
+echo $message >> /data/setup.log
+sudo apt install git python-dev python-virtualenv libpq-dev protobuf-compiler libprotobuf-dev -y  >> /dev/null
+message='installing postgres'
+echo $message
+echo $message >> /data/setup.log
+sudo apt-get install postgresql-9.5 postgresql-contrib-9.5 postgresql-client-common -y  >> /dev/null
+sudo apt-get install postgresql-9.5-postgis-2.2 -y >> /dev/null
 
 message='initialisation of the user osmose'
 echo $message
