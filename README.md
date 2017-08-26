@@ -17,13 +17,9 @@ To install this virtual machine, here are the steps :
 Frontend and Backend are connected, but only for a limited list of tests.
 The activated tests are listed in the `./backend/osmose_config.py` file and configued in the `./setup4_front_back_link.sh` file
 
-## Trouble shouting
-### Error 500 on frontend
-If you enconter a '500 : Server Errror', this may be caused by wrong rights with some files.
-Follow the folling steps :
-1. login as a root user (`vagrant ssh` followed by `su -` with password `vagrant`)
-2. run `chmod -R 777 /data/frontend/session/`
+Be careful : when accessing vagrant by ssh, the backend virtualenv will be activated and the current directory will be `/data`
 
+## Trouble shouting
 ### Some items doesn't show properly on frontend
 This may be caused by a misconfiguration of the frontend database.
 Follow the folling steps :

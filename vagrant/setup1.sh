@@ -16,6 +16,7 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 sudo sh -c "echo 'export LC_ALL=\"fr_FR.UTF-8\"' >> ~/.bashrc"  >> /data/setup.log
 source ~/.bashrc
+sudo timedatectl set-timezone Europe/Paris
 
 
 message='Updating packages'

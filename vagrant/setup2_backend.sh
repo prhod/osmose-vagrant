@@ -38,3 +38,6 @@ else
     echo $message
     echo $message >> /data/setup.log
 fi
+
+echo "source /data/backend/osmose-backend-venv/bin/activate" >> ~/.bashrc
+echo "cd /data" >> ~/.bashrc
